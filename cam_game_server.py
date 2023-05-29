@@ -108,8 +108,9 @@ def sendto(msg, addr):
     sending = f"server: {msg}"
     addr.send(sending.encode('utf-8'))
 
+myip = str(socket.gethostbyname(socket.gethostname()))
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server.bind(('192.168.31.31',7835))
+server.bind((myip,7835))
 server.listen()
 print("[RUNNING] Server is running")
 while True:
