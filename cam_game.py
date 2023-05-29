@@ -10,11 +10,11 @@ import socket
 
 
 
-dotsX = [0,0]
-dotsY = [0,0]
-color = ['black','black']
-dotsX2 = [0,0]
-dotsY2 = [0,0]
+dotsX = [10,10]
+dotsY = [10,20]
+color = ['black','red']
+dotsX2 = [10,10]
+dotsY2 = [10,10]
 color2 = ['black','black']
 
 
@@ -27,19 +27,29 @@ width = 0
 height = 0
 playing = False
 
+class showdrawing():
+    def __init__(self): 
+        #print('im in the testui and playing is: ' + str(playing))
+        global width
+        global height
+        while(width == 0):
+            time.sleep(0.1)
+        # Create the window and canvas
+        self.root2 = tk.Tk()
+        self.canvas2 = tk.Canvas(self.root2, width=width, height=height)
+        self.canvas2.pack()
+        self.root2.after(10, self.add_dot)
+        # Start the main loop
+        self.root2.mainloop()
 
-def testui():
-    def add_dot():
+    def add_dot(self):
         global playing
         global now,now2
         global PREV_DOT,PREV_DOT2
         global dotsX,dotsY,dotsX2,dotsY2,width,height
-        #print(dotsX)
-        #print(now)
-        #print('testui!')
         if not playing:
             print('exiting')
-            root.quit()
+            self.root2.quit()
             dotsX = []
             dotsY = []
             dotsX2 = []
@@ -53,55 +63,40 @@ def testui():
             x = int(dotsX[now])
             y = int(dotsY[now])
 
-            dot = canvas.create_oval(x, y, x + 3, y + 3, fill=color[now],outline=color[now])
+            dot = self.canvas2.create_oval(x, y, x + 3, y + 3, fill=color[now],outline=color[now])
             if PREV_DOT == 0:
                 PREV_DOT = dot
 
             if 'PREV_DOT' in globals():
-                x1, y1, _, _ = canvas.coords(PREV_DOT)
+                x1, y1, _, _ = self.canvas2.coords(PREV_DOT)
                 distance = math.sqrt(math.pow((x1 - x), 2) + math.pow((y1 - y), 2))
                 if(distance < 30.0):
-                    canvas.create_line(x, y, x1, y1, width=4,fill=color[now])
+                    self.canvas2.create_line(x, y, x1, y1, width=4,fill=color[now])
 
-            root.after(10, add_dot)
+            self.root2.after(10, self.add_dot)
             PREV_DOT = dot
-        else:
-            #print('dotsx is too short - ' +str(dotsX))
-            root.after(100, add_dot)
-        if (now2 < len(dotsX2) - 1):
+        elif (now2 < len(dotsX2) - 1):
             now2 += 1
 
             x2 = int(dotsX2[now2])
             y2 = int(dotsY2[now2])
 
-            dot2 = canvas.create_oval(x2, y2, x2 + 3, y2 + 3, fill=color2[now2],outline=color2[now2])
+            dot2 = self.canvas2.create_oval(x2, y2, x2 + 3, y2 + 3, fill=color2[now2],outline=color2[now2])
             if PREV_DOT2 == 0:
                 PREV_DOT2 = dot2
 
             if 'PREV_DOT2' in globals():
-                x3, y3, _, _ = canvas.coords(PREV_DOT)
+                x3, y3, _, _ = self.canvas2.coords(PREV_DOT)
                 distance = math.sqrt(math.pow((x3 - x2), 2) + math.pow((y3 - y2), 2))
                 if (distance < 30.0):
-                    canvas.create_line(x2, y2, x3, y3, width=4,fill=color2[now2])
+                    self.canvas2.create_line(x2, y2, x3, y3, width=4,fill=color2[now2])
 
-            root.after(10, add_dot)
+            self.root2.after(10, self.add_dot)
             PREV_DOT2 = dot2
         else:
             #print('dotsx2 is too short - ' + str(dotsX2))
-            root.after(100, add_dot)
-    #print('im in the testui and playing is: ' + str(playing))
-    global width
-    global height
-    while(width == 0):
-        time.sleep(0.1)
-    # Create the window and canvas
-    root = tk.Tk()
-    canvas = tk.Canvas(root, width=width, height=height)
-    canvas.pack()
-    root.after(10, add_dot)
+            self.root2.after(100, self.add_dot)
 
-    # Start the main loop
-    root.mainloop()
 
 
 
@@ -347,7 +342,7 @@ def game(msg):
         if msgg.find("server: #you are watching") == 0:
             print("watching")
             playing = True
-            threadd = threading.Thread(target=testui)
+            threadd = threading.Thread(target=showdrawing)
             threadd.start()
         if (Imsg.find('@px2') == 1):
             msg2 = Imsg[Imsg.find('-') + 1:]
@@ -369,7 +364,7 @@ def game(msg):
         elif (Imsg.find("@reset") == 1):
             playing = False
             playing = True
-            threadd = threading.Thread(target=testui)
+            threadd = threading.Thread(target=showdrawing)
             threadd.start()
         elif(Imsg != ''):
             add_message_to_ui(msgg)
@@ -422,7 +417,7 @@ chat_ui_thread = threading.Thread(target=run_chat_ui)
 chat_ui_thread.start()
 time.sleep(1)
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-client.connect(('10.99.240.127', 5555))
+client.connect(('192.168.31.31', 5555))
 add_message_to_ui("connected to - ('127.0.0.1', 5555)")
 thread = threading.Thread(target=receive_messages)
 thread.start()
