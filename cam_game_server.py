@@ -12,9 +12,10 @@ points = []
 currect = []
 currentword = ''
 timer = 0
+rounds = 1
 
 def handle_client(conn, addr):
-    global timer, currentword,currect,points,playing,ready,allAddres
+    global timer, currentword,currect,points,playing,ready,allAddres,rounds
     allAddres.append(addr)
     ready.append(False)
     print(f"[NEW CONNECTION] {addr} connected.")
@@ -24,6 +25,8 @@ def handle_client(conn, addr):
             break
         print(f"{addr} : {msg}")
         count = 0
+        if(msg == "!exit"):
+            remove_client(conn)
         if(msg == "!test"):
             broadcast("#you are watching",None,"server")
             broadcast("@width - 500,height - 600", None , "server")
@@ -56,30 +59,45 @@ def handle_client(conn, addr):
                         thread = threading.Thread(target=game)
                         thread.start()
                 count += 1
+        elif(str(msg).find("!time ") == 0):
+            broadcast("@time = " + msg[str(msg).find(" ") + 1:], None,server)
+        elif(str(msg).find("!rounds") == 0):
+           rounds = int(msg[str(msg).find(" ") + 1:])
         else: 
             broadcast(msg, conn, addr)
     conn.close()
 
 def game():
-    global timer, points, currect,currentword,words,playing
+    global timer, points, currect,currentword,words,playing,rounds
     for i in range(len(clients)):
         points.append(0)
         currect.append(False)
     playing = True
-    for i in range(len(clients)):
-        currentword = words[random.randint(0,len(words)-1)]
-        print(str(clients[i]) + " is drawing")
-        sendto(("#you are drawing the word : " + currentword),clients[i])
-        broadcast("#you are watching",clients[i],"server")
-        currect[i] = True
-        endtime = int(time.time()) + 90
-        timer = endtime - int(time.time())
-        while timer > 1:
+    for i in range(rounds):
+        for i in range(len(clients)):
+            currentword = words[random.randint(0,len(words)-1)]
+            print(str(clients[i]) + " is drawing")
+            sendto(("#you are drawing the word : " + currentword),clients[i])
+            broadcast("#you are watching",clients[i],"server")
+            currect[i] = True
+            endtime = int(time.time()) + 90
             timer = endtime - int(time.time())
-            time.sleep(1)
-        broadcast("@done",None,"server")
+            while timer > 1:
+                timer = endtime - int(time.time())
+                time.sleep(1)
+            broadcast("@done",None,"server")
+        broadcast("points:", None,"server")
+    for i in range(len(clients)):
+        broadcast(clients[i] + " - " + points[i], None,"server")
         
-    
+def remove_client(client):
+    global clients
+    if client in clients:
+        clients.remove(client)
+        print(f"Client {client} has been removed.")
+    else:
+        print(f"Client {client} not found in clients array.")
+ 
 def broadcast(msg, conn, addr):
     for client in clients:
         if client != conn:
@@ -91,11 +109,13 @@ def sendto(msg, addr):
     addr.send(sending.encode('utf-8'))
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server.bind(('192.168.31.31', 5555))
+server.bind(('192.168.31.31',7835))
 server.listen()
 print("[RUNNING] Server is running")
 while True:
     conn, addr = server.accept()
+    msg = 'hello!!'
+    conn.send(msg.encode('utf-8'))
     clients.append(conn)
     thread = threading.Thread(target=handle_client, args=(conn, addr))
     thread.start()
