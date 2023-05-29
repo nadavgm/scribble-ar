@@ -33,7 +33,7 @@ def testui():
         global playing
         global now,now2
         global PREV_DOT,PREV_DOT2
-        global dotsX,dotsY,dotsX2,dotsY2
+        global dotsX,dotsY,dotsX2,dotsY2,width,height
         #print(dotsX)
         #print(now)
         #print('testui!')
@@ -44,6 +44,8 @@ def testui():
             dotsY = []
             dotsX2 = []
             dotsY2 = []
+            height = 0
+            width = 0
             return
         if(now < len(dotsX) - 1):
             now += 1
@@ -55,17 +57,17 @@ def testui():
             if PREV_DOT == 0:
                 PREV_DOT = dot
 
-            if 'PREV_DOT' in globals():
-                x1, y1, _, _ = canvas.coords(PREV_DOT)
-                distance = math.sqrt(math.pow((x1 - x), 2) + math.pow((y1 - y), 2))
-                if(distance < 30.0):
-                    canvas.create_line(x, y, x1, y1, width=4,fill=color[now],outline=color[now])
+            #if 'PREV_DOT' in globals():
+                #x1, y1, _, _ = canvas.coords(PREV_DOT)
+                #distance = math.sqrt(math.pow((x1 - x), 2) + math.pow((y1 - y), 2))
+                #if(distance < 30.0):
+                    #canvas.create_line(x, y, x1, y1, width=4,fill=color[now])
 
             root.after(10, add_dot)
             PREV_DOT = dot
         else:
             #print('dotsx is too short - ' +str(dotsX))
-            root.after(10, add_dot)
+            root.after(100, add_dot)
         if (now2 < len(dotsX2) - 1):
             now2 += 1
 
@@ -76,17 +78,17 @@ def testui():
             if PREV_DOT2 == 0:
                 PREV_DOT2 = dot2
 
-            if 'PREV_DOT2' in globals():
-                x3, y3, _, _ = canvas.coords(PREV_DOT)
-                distance = math.sqrt(math.pow((x3 - x2), 2) + math.pow((y3 - y2), 2))
-                if (distance < 30.0):
-                    canvas.create_line(x2, y2, x3, y3, width=4,fill=color2[now2],outline=color2[now2])
+            #if 'PREV_DOT2' in globals():
+                #x3, y3, _, _ = canvas.coords(PREV_DOT)
+                #distance = math.sqrt(math.pow((x3 - x2), 2) + math.pow((y3 - y2), 2))
+                #if (distance < 30.0):
+                    #canvas.create_line(x2, y2, x3, y3, width=4,fill=color2[now2])
 
             root.after(10, add_dot)
             PREV_DOT2 = dot2
         else:
             #print('dotsx2 is too short - ' + str(dotsX2))
-            root.after(10, add_dot)
+            root.after(100, add_dot)
     #print('im in the testui and playing is: ' + str(playing))
     global width
     global height
@@ -96,7 +98,7 @@ def testui():
     root = tk.Tk()
     canvas = tk.Canvas(root, width=width, height=height)
     canvas.pack()
-    root.after(1, add_dot)
+    root.after(10, add_dot)
 
     # Start the main loop
     root.mainloop()
@@ -304,7 +306,7 @@ def trackhands():
         pTime = cTime
 
         #cv2.putText(img, 'fps: ' + str(int(fps)), (10, 20), cv2.FONT_HERSHEY_PLAIN, 1, (0, 0, 0), 2)
-        cv2.putText(img, 'time left: ' + str(int(cTime - start)), (10, 20), cv2.FONT_HERSHEY_PLAIN, 1, (0, 0, 0), 2)
+        cv2.putText(img, 'time left: ' + str(90 - int(cTime - start)), (10, 20), cv2.FONT_HERSHEY_PLAIN, 1, (0, 0, 0), 2)
 
         for i in range(len(dotsX) - 1):
             cv2.circle(img, (dotsX[i], dotsY[i]), 3, (0, 0, 0), cv2.FILLED)
@@ -318,8 +320,8 @@ def trackhands():
             if distance1 < 20:
                 cv2.line(img, (dotsX2[i], dotsY2[i]), (dotsX2[i+1], dotsY2[i+1]), (0, 0, 0), 2)
 
-        cv2.putText(img, 'clear', (int(width - (width/7)), int(height - (height/7))), cv2.FONT_HERSHEY_PLAIN, 1, (0, 255, 0), 2)
-        cv2.rectangle(img,(int(width - (width/6))),int(height - (height/6)) ,(width - 1 ,height - 1),(255,0,0),2)
+        cv2.putText(img, 'clear', (int(width - (width/8)), int(height - (height/8))), cv2.FONT_HERSHEY_PLAIN, 1, (0, 0, 255), 2)
+        cv2.rectangle(img,(int(width - (width/6)),int(height - (height/6))) ,(width - 1 ,height - 1),(0,0,255),2)
         cv2.imshow("Image", img)
         cv2.waitKey(1)
     dotsX = []
@@ -332,11 +334,11 @@ def game(msg):
     msglst = []
     msglst = msg.split('\n')
     Imsg = ""
-    print(msglst)
+    #print(msglst)
     for msgg in msglst:
         Imsg = msgg[msgg.find(":") + 1:]
         Imsg.replace('\n', '')
-        print(Imsg)
+        #print(Imsg)
         if msgg.find("server: #you are drawing") == 0:
             print("drawing")
             playing = True
@@ -420,7 +422,7 @@ chat_ui_thread = threading.Thread(target=run_chat_ui)
 chat_ui_thread.start()
 time.sleep(1)
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-client.connect(('127.0.0.1', 5555))
+client.connect(('10.99.240.127', 5555))
 add_message_to_ui("connected to - ('127.0.0.1', 5555)")
 thread = threading.Thread(target=receive_messages)
 thread.start()

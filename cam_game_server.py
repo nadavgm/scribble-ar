@@ -32,7 +32,7 @@ def handle_client(conn, addr):
             print("playing is true")
             if(msg == currentword):
                 broadcast(str(addr) + " got the word!", None, 'server')
-                for i in range(allAddres):
+                for i in range(len(allAddres)):
                     if(allAddres[i] == addr):
                         points[i] += 50 * timer
                         currect[i] == True
@@ -65,7 +65,7 @@ def game():
         currect.append(False)
     playing = True
     for i in range(len(clients)):
-        currentword = words[random.randint(0,len(words))]
+        currentword = words[random.randint(0,len(words)-1)]
         print(str(clients[i]) + " is drawing")
         sendto(("#you are drawing the word : " + currentword),clients[i])
         broadcast("#you are watching",clients[i],"server")
@@ -89,7 +89,7 @@ def sendto(msg, addr):
     addr.send(sending.encode('utf-8'))
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server.bind(('127.0.0.1', 5555))
+server.bind(('10.99.240.127', 5555))
 server.listen()
 print("[RUNNING] Server is running")
 while True:
