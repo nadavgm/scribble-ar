@@ -57,11 +57,11 @@ def testui():
             if PREV_DOT == 0:
                 PREV_DOT = dot
 
-            #if 'PREV_DOT' in globals():
-                #x1, y1, _, _ = canvas.coords(PREV_DOT)
-                #distance = math.sqrt(math.pow((x1 - x), 2) + math.pow((y1 - y), 2))
-                #if(distance < 30.0):
-                    #canvas.create_line(x, y, x1, y1, width=4,fill=color[now])
+            if 'PREV_DOT' in globals():
+                x1, y1, _, _ = canvas.coords(PREV_DOT)
+                distance = math.sqrt(math.pow((x1 - x), 2) + math.pow((y1 - y), 2))
+                if(distance < 30.0):
+                    canvas.create_line(x, y, x1, y1, width=4,fill=color[now])
 
             root.after(10, add_dot)
             PREV_DOT = dot
@@ -78,11 +78,11 @@ def testui():
             if PREV_DOT2 == 0:
                 PREV_DOT2 = dot2
 
-            #if 'PREV_DOT2' in globals():
-                #x3, y3, _, _ = canvas.coords(PREV_DOT)
-                #distance = math.sqrt(math.pow((x3 - x2), 2) + math.pow((y3 - y2), 2))
-                #if (distance < 30.0):
-                    #canvas.create_line(x2, y2, x3, y3, width=4,fill=color2[now2])
+            if 'PREV_DOT2' in globals():
+                x3, y3, _, _ = canvas.coords(PREV_DOT)
+                distance = math.sqrt(math.pow((x3 - x2), 2) + math.pow((y3 - y2), 2))
+                if (distance < 30.0):
+                    canvas.create_line(x2, y2, x3, y3, width=4,fill=color2[now2])
 
             root.after(10, add_dot)
             PREV_DOT2 = dot2
