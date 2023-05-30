@@ -27,23 +27,17 @@ def handle_client(conn, addr):
         count = 0
         if(msg == "!exit"):
             remove_client(conn)
-        if(msg == "!test"):
-            broadcast("#you are watching",None,"server")
-            broadcast("@width - 500,height - 600", None , "server")
-            broadcast("@px - 105,py - 405,color - yellow", None , "server")
-            broadcast("@px2 - 200,py2 - 200,color2 - green", None , "server")
-            #broadcast("@done", None , "server")
         if(playing == True):
             print("playing is true")
             if(msg == currentword):
                 broadcast(str(addr) + " got the word!", None, 'server')
                 for i in range(len(allAddres)):
                     if(allAddres[i] == addr):
-                        points[i] += 50 * timer
+                        points[i] += 10 * timer
                         currect[i] == True
                         if currect.index(False) == -1:
                             timer = 0
-        if(msg == "!ready"):
+        elif(msg == "!ready"):
             for i in allAddres:
                 if(i == addr):
                     broadcast(f"{i} is ready", conn, addr)
@@ -71,7 +65,7 @@ def handle_client(conn, addr):
     conn.close()
 
 def game():
-    global timer, points, currect,currentword,words,playing,rounds
+    global timer, points, currect,currentword,words,playing,rounds,ready
     for i in range(len(clients)):
         points.append(0)
         currect.append(False)
@@ -80,8 +74,8 @@ def game():
         for i in range(len(clients)):
             currentword = words[random.randint(0,len(words)-1)]
             print(str(clients[i]) + " is drawing")
-            sendto(("#you are drawing the word : " + currentword),clients[i])
-            broadcast("#you are watching",clients[i],"server")
+            sendto(("@you are drawing the word : " + currentword),clients[i])
+            broadcast("@you are watching " + ('_ ' * len(currentword)),clients[i],"server")
             currect[i] = True
             endtime = int(time.time()) + 90
             timer = endtime - int(time.time())
@@ -90,8 +84,10 @@ def game():
                 time.sleep(1)
             broadcast("@done",None,"server")
         broadcast("points:", None,"server")
+    playing = False
     for i in range(len(clients)):
         broadcast(clients[i] + " - " + points[i], None,"server")
+        ready[i] = False
         
 def remove_client(client):
     global clients,allAddres ,ready , points,currect
