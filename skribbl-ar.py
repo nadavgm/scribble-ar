@@ -463,6 +463,7 @@ def send_message():
     if choose:
         if str(message).lower() == 'yes':
             add_message_to_ui("finding servers... (might take some time)")
+            time.sleep(1)
             findservers()
             choose = False
         elif str(message).lower() == 'no':
